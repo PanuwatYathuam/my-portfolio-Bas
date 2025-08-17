@@ -1,11 +1,22 @@
+import { useState } from 'react';
 import { ExternalLink, Github } from 'lucide-react';
 import ProjectCard from './ProjectCard';
 import { projects } from '../../data/portfolioData';
 import './Projects.css';
 
 function Projects() {
-  // ไม่ต้องใช้ useState และส่วนของการกรอง (filter) แล้ว
-  
+  const [filter, setFilter] = useState('all');
+
+  const technologies = ['all', ...new Set(
+    projects.flatMap(project => project.technologies)
+  )];
+
+  const filteredProjects = filter === 'all' 
+    ? projects 
+    : projects.filter(project => 
+        project.technologies.includes(filter)
+      );
+
   return (
     <section id="projects" className="projects section">
       <div className="container">
@@ -14,17 +25,27 @@ function Projects() {
           Here are some of the projects I've worked on recently.
         </p>
 
-        {/* นำส่วนของ project-filters ออก */}
-        
+        <div className="project-filters">
+          {technologies.map(tech => (
+            <button
+              key={tech}
+              className={`filter-btn ${filter === tech ? 'active' : ''}`}
+              onClick={() => setFilter(tech)}
+            >
+              {tech.charAt(0).toUpperCase() + tech.slice(1)}
+            </button>
+          ))}
+        </div>
+
         <div className="projects-grid">
-          {projects.map(project => (
+          {filteredProjects.map(project => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
 
-        {projects.length === 0 && (
+        {filteredProjects.length === 0 && (
           <div className="no-projects">
-            <p>No projects found.</p>
+            <p>No projects found for this technology.</p>
           </div>
         )}
       </div>
